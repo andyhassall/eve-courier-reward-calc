@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="icon" href="../../favicon.ico">
+
+<title>EVE Online Courier Contract Reward Calculator</title>
+
+<!-- Bootstrap core CSS -->
+<link rel="stylesheet"
+ href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+ integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+ crossorigin="anonymous">
+
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    
+ <script src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+    
+</head>
+
+<body>
+
+ <div class="container" style="margin-top: 12em;">
+
+  <div class="row">
+   <form class="form-horizontal" action="" id="courier-calc">
+   
+    <!-- 
+    <div class="form-group">
+     <label for="inputStartSolarSystem" class="col-sm-2 control-label">Start solarsystem</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputStartSolarSystem" placeholder="Start solarsystem">
+     </div>
+    </div>
+
+    <div class="form-group">
+     <label for="inputDestinationSolarSystem" class="col-sm-2 control-label">Destination solarsystem</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputDestinationSolarSystem" placeholder="Destination solarsystem">
+     </div>
+    </div>
+ 
+    <div class="form-group">
+     <div class="col-sm-10 col-sm-offset-2">
+      Enter start and destination systems.
+     </div>
+    </div>
+    -->
+
+    <div class="form-group">
+     <label for="inputJumps" class="col-sm-2 control-label">Jumps (highsec only)</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputJumps" placeholder="Jumps">
+     </div>
+    </div>
+    
+    <div class="form-group">
+     <label for="inputVolume" class="col-sm-2 control-label">Volume</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputVolume"  placeholder="Volume">
+     </div>
+    </div>
+    
+    <div class="form-group">
+     <div class="col-sm-10 col-sm-offset-2" id="volumePresets">
+      <a class="btn btn-default" data-volume="50">Interceptor (50m<sup>3</sup>)</a>
+      <a class="btn btn-default" data-volume="6000">Blockade Runner (6000m<sup>3</sup>)</a>
+      <a class="btn btn-default" data-volume="60000">Deep Space Transport (60000m<sup>3</sup>)</a>
+      <a class="btn btn-default" data-volume="340000">Jump Freighter (340000m<sup>3</sup>)</a>
+      <a class="btn btn-default" data-volume="845000">Freighter (845000m<sup>3</sup>)</a>
+     </div>
+    </div>
+
+    <div class="form-group">
+     <label for="inputCollateral" class="col-sm-2 control-label">Collateral</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputCollateral"  placeholder="Collateral">
+     </div>
+    </div>
+    
+    <div class="form-group">
+     <div class="col-sm-10 col-sm-offset-2" id="collateralPresets">
+      <a class="btn btn-default" data-collateral="100000000">100M</a> 
+      <a class="btn btn-default" data-collateral="250000000">250M</a> 
+      <a class="btn btn-default" data-collateral="500000000">500M</a> 
+      <a class="btn btn-default" data-collateral="1000000000">1B</a>
+      <a class="btn btn-default" data-collateral="2000000000">2B</a>
+      <a class="btn btn-default" data-collateral="3000000000">3B</a>
+      <a class="btn btn-default" data-collateral="4000000000">4B</a>
+      <a class="btn btn-default" data-collateral="5000000000">5B</a>
+     </div>
+    </div>
+
+    <div class="form-group">
+     <label for="inputIskPerJump" class="col-sm-2 control-label">ISK per jump</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputIskPerJump"  placeholder="ISK per jump" disabled="disabled">
+     </div>
+    </div>
+
+    <div class="form-group">
+     <label for="inputReward" class="col-sm-2 control-label">Reward</label>
+     <div class="col-sm-10">
+      <input type="text" class="form-control" id="inputReward"  placeholder="Reward" disabled="disabled">
+     </div>
+    </div>
+
+<!-- 
+    <div class="form-group">
+     <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-default">Sign in</button>
+     </div>
+    </div>
+     -->
+     
+     
+   </form>
+  </div>
+
+ </div>
+ <!-- /container -->
+
+<script>
+$(function() {
+
+	$("#volumePresets").on("click", ".btn", function () {
+		$("#inputVolume").val($(this).data("volume"));
+        calculateReward();
+	});
+
+	$("#collateralPresets").on("click", ".btn", function () {
+        $("#inputCollateral").val($(this).data("collateral"));
+        calculateReward();
+    });
+	
+	function calculateReward() {
+        var jumps = parseFloat($("#inputJumps").val());
+        var volume = parseFloat($("#inputVolume").val());
+        var collateral = parseFloat($("#inputCollateral").val());
+        
+        if (jumps > 0 && volume > 0 && collateral > 0) {
+            
+        	var iskPerJumpPerBillion;
+        	
+        	if (volume <= 50) {
+        		iskPerJumpPerBillion = 100000;
+        	} else if (volume <= 6000) {
+        		iskPerJumpPerBillion = 200000;
+        	} else if (volume <= 60000) {
+        		iskPerJumpPerBillion = 500000;
+        	} else {
+        		iskPerJumpPerBillion = 1000000;
+        	}
+        	
+        	var iskPerJump = iskPerJumpPerBillion * (collateral / 1000000000);
+        	var reward = iskPerJump * jumps;
+        	
+        	$("#inputIskPerJump").val(iskPerJump);
+            $("#inputReward").val(reward);
+       
+        } else {
+            $("#inputIskPerJump").val("-");
+            $("#inputReward").val("-");
+        }
+	}	
+
+	$("#courier-calc").on("change keyup", calculateReward);
+	
+	calculateReward();
+});
+
+</script>
+
+</body>
+</html>
